@@ -18,7 +18,16 @@ void displayMenu(Letter wordGrid[][4]){   // displays the menu and title
         cout << "      ";
 
         for(int j = 0; j < 4; j++){
-            cout << wordGrid[i][j].getActualLetter() << " ";
+
+            if(wordGrid[i][j].getColor() == "GREEN"){
+                cout << "\033[0;32m";
+            }
+            else if(wordGrid[i][j].getColor() == "YELLOW"){
+                cout << "\033[0;33m";
+            }
+
+            cout << wordGrid[i][j].getActualLetter() << "\033[0m" << " ";
+
         }
 
         cout << endl;
@@ -31,19 +40,124 @@ void displayMenu(Letter wordGrid[][4]){   // displays the menu and title
 string toUpper(string word){    // converts all the words to uppercase so they can be typed in any format
     
     for(int i = 0; i < 4; i++){
-        word[i] -= 32;
+        if(word[i] >= 'a' && word[i] <= 'z'){
+            word[i] -= 32;
+        }
     }
 
     return word;
 
 }
 
-void evaluate(string currWord, string randomWord, Letter wordGrid[][4], int row, bool &canPlay){  // checks a word against the correct word
-    
-    if(currWord == randomWord){
-        for(int i = 0; i < 4; i++){
-            wordGrid[row][i] =  
+bool isValid(string word){
+
+    if(word.length() != 4){
+        return false;
+    }
+
+    for(int i = 0; i < 4; i++){
+        if(word[i] < 'A' || word[i] > 'z' || (word[i] > 'Z' && word[i] < 'a')){
+            return false;
         }
+    }
+
+    return true;
+
+}
+
+void evaluate(string currWord, string randomWord, Letter wordGrid[][4], int row, bool &canPlay, bool &win){  // checks a word against the correct word
+    
+    int counter = 0; 
+    vector<char> matchedLetters;
+    vector<char> yellowLetters;
+    char duplicate = '1';
+    
+    currWord = toUpper(currWord);
+
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < 4; j++){
+            if(randomWord[i] == randomWord[j] && i != j){
+                duplicate = randomWord[i];
+                //cout << duplicate << endl;   // debugging line
+            }
+        }
+    }
+
+    for(int i = 0; i < 4; i++){
+
+        wordGrid[row][i].setActualLetter(currWord[i]);
+
+        if(currWord[i] == randomWord[i]){
+            wordGrid[row][i].setColor("GREEN");
+            counter++;
+            matchedLetters.push_back(currWord[i]);
+        }
+
+    }
+
+    for(int i = 0; i < 4; i ++){   
+        for(int j = 0; j < 4; j++){
+
+            if(currWord[i] == randomWord[j] && i != j){
+
+                if(currWord[i] != duplicate){
+
+                    bool found = false;
+
+                    for(int k = 0; k < matchedLetters.size(); k++){
+                        if(currWord[i] == matchedLetters[k]){
+                            // cout << matchedLetters[k] << endl << endl;   // debugging line
+                            found = true;
+                        }
+                    }
+
+                    for(int k = 0; k < yellowLetters.size(); k++){
+                        if(currWord[i] == yellowLetters[k]){
+                            found = true;
+                        }
+                    }
+
+                    if(!found){
+                        wordGrid[row][i].setColor("YELLOW");
+                        yellowLetters.push_back(currWord[i]);
+                    }
+
+                }
+                else{
+
+                    bool found = false;
+                    int dupeCounter = 0;
+                    
+                    for(int k = 0; k < matchedLetters.size(); k++){
+                        if(currWord[i] == matchedLetters[k]){
+                            dupeCounter++;
+                        }
+                    }
+
+                    for(int k = 0; k < yellowLetters.size(); k++){
+                        if(currWord[i] == yellowLetters[k]){
+                            dupeCounter++;
+                        }
+                    }
+
+                    if(dupeCounter >= 2){
+                        found = true;
+                    }
+
+                    if(!found){
+                        wordGrid[row][i].setColor("YELLOW");
+                    }
+
+                }
+            }
+
+        }
+
+    }
+
+    if(counter == 4){
+        canPlay = false;
+        win = true;
     }
 
 }
@@ -53,7 +167,8 @@ int main(){
 
 
     // Variable Declarations
-
+    
+    bool win = false;
     bool canPlay = true;    // boolean for if the game is still going or not
     int row = 0;    // current row #
     string currWord;    // current word that the user guessed
@@ -80,6 +195,7 @@ int main(){
     srand(time(NULL));
     int randIndex = rand() % 150;
     randomWord = toUpper(words[randIndex]);
+    //cout << endl << randomWord << endl;  // debugging - shows the random word
 
     cout << "\n\033[1mFour letters, seven tries. Good luck!\033[0m\n\n";    // Welcome Message
 
@@ -92,14 +208,18 @@ int main(){
 
         do{
             cin >> currWord;
-            if(cin.fail() || currWord.length() != 4){
+            if(cin.fail() || isValid(currWord) == false){
                 cout << "Invalid word. Try again." << endl;
             }
-        }while(cin.fail() || currWord.length() != 4);
+        }while(cin.fail() || isValid(currWord) == false);
 
-        evaluate(currWord,randomWord,wordGrid,row,canPlay);
+        currWord = toUpper(currWord);
 
-        row++;
+        evaluate(currWord,randomWord,wordGrid,row,canPlay,win);
+
+        if(!win){
+            row++;
+        }
 
         if(row > 6){
             canPlay = false;
@@ -107,12 +227,61 @@ int main(){
 
     }
 
+    displayMenu(wordGrid);
+
+    cout << endl << "The word was: " << randomWord << endl << endl;
+
+    if(row > 6){
+        cout << "X/7 - blame it on the word!" << endl << endl;
+    }
+    else{
+
+        cout << row + 1 << "/7 - ";
+
+        switch(row){
+
+            case 0:
+                cout << "you've mastered Fourdle";
+            break;
+
+            case 1:
+                cout << "Impressive!";
+            break;
+
+            case 2:
+                cout << "Great!";
+            break;
+
+            case 3:
+                cout << "Well done!";
+            break;
+
+            case 4:
+                cout << "Congrats!";
+            break;
+
+            case 5:
+                cout << "Nice!";
+            break;
+
+            case 6:
+                cout << "Close one!";
+            break;
+
+        }
+        
+    }
+
+    cout << endl << endl;
 
     if(randomWord == "FRED"){
-        cout << "Hey that\'s me!" << endl;
+        cout << "Hey that\'s me!" << endl << endl;
     }
     if(randomWord == "FIVE"){
-        cout << "Ironic..." << endl;
+        cout << "Ironic..." << endl << endl;
     }
+
+
+
     return 0;
 }
