@@ -2,13 +2,13 @@
 
 ## Summary
 
-Fourdle is a terminal-based game written in C++ based on the popular game "Wordle". The difference between the two is that "Wordle" gives you 6 attempts to guess a 5 letter word, and in Fourdle you get 7 attempts to guess a 4 letter word.
+**Fourdle** is a terminal-based game written in C++ based on the popular game "Wordle". The difference between the two is that "Wordle" gives you 6 attempts to guess a 5 letter word, and in Fourdle you get 7 attempts to guess a 4 letter word.
 
 ## How to Play
 
 1. Open a terminal
-2. Navigate to the directory that the Fourdle folder is in using the 'cd' command
-3. Enter './playFourdle' into the terminal
+2. Navigate to the directory that the Fourdle folder is in using the `cd` command
+3. Enter `./playFourdle` into the terminal
 
 ## Game Rules
 
@@ -24,7 +24,7 @@ Fourdle is a terminal-based game written in C++ based on the popular game "Wordl
 
 ## Notes
 
-- The list of possible words to be used as the "random word" was manually created by me to avoid "annoying" words that have too many uncommon letters or are not well-known
+- The list of possible words to be used as the random word was manually created by me to avoid "annoying" words that have too many uncommon letters or are not well-known
     - The list is 300 words long
 
 - The list of possible words to try as guesses includes all of the four-letter words in the dictionary
