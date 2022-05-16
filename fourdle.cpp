@@ -11,19 +11,19 @@ using namespace std;
 
 void displayMenu(Letter wordGrid[][4]){   // displays the menu and title
 
-    cout << "\n-----\033[1;32m FOURDLE \033[0m-----\n";
+    cout << "\n-----\033[1;32m FOURDLE \033[0m-----\n"; // title
 
-    for(int i  = 0; i < 7; i++){
+    for(int i  = 0; i < 7; i++){    // row loop
 
         cout << "      ";
 
-        for(int j = 0; j < 4; j++){
+        for(int j = 0; j < 4; j++){ // individual row
 
             if(wordGrid[i][j].getColor() == "GREEN"){
-                cout << "\033[0;32m";
+                cout << "\033[1;32m";   // bolded green
             }
             else if(wordGrid[i][j].getColor() == "YELLOW"){
-                cout << "\033[0;33m";
+                cout << "\033[1;33m";   // bolded yellow
             }
 
             cout << wordGrid[i][j].getActualLetter() << "\033[0m" << " ";
@@ -49,7 +49,7 @@ string toUpper(string word){    // converts all the words to uppercase so they c
 
 }
 
-bool isValid(string word){
+bool isValid(string word){  // checks if the inputted word is a real 4-letter word
 
     if(word.length() != 4){
         return false;
@@ -67,14 +67,14 @@ bool isValid(string word){
 
 void evaluate(string currWord, string randomWord, Letter wordGrid[][4], int row, bool &canPlay, bool &win){  // checks a word against the correct word
     
-    int counter = 0; 
+    int counter = 0; // counter for how many green letters there are
     vector<char> matchedLetters;
     vector<char> yellowLetters;
-    char duplicate = '1';
+    char duplicate = '1';   // random char so it won't accidentally match
     
     currWord = toUpper(currWord);
 
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < 4; i++){ // search for a duplicate letter, i.e 'O' in "FOOL"
         for(int j = 0; j < 4; j++){
             if(randomWord[i] == randomWord[j] && i != j){
                 duplicate = randomWord[i];
@@ -83,7 +83,7 @@ void evaluate(string currWord, string randomWord, Letter wordGrid[][4], int row,
         }
     }
 
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < 4; i++){ // set all green letters first
 
         wordGrid[row][i].setActualLetter(currWord[i]);
 
@@ -95,7 +95,7 @@ void evaluate(string currWord, string randomWord, Letter wordGrid[][4], int row,
 
     }
 
-    for(int i = 0; i < 4; i ++){   
+    for(int i = 0; i < 4; i ++){    // search for yellow letters
         for(int j = 0; j < 4; j++){
 
             if(currWord[i] == randomWord[j] && i != j){
@@ -106,7 +106,6 @@ void evaluate(string currWord, string randomWord, Letter wordGrid[][4], int row,
 
                     for(int k = 0; k < matchedLetters.size(); k++){
                         if(currWord[i] == matchedLetters[k]){
-                            // cout << matchedLetters[k] << endl << endl;   // debugging line
                             found = true;
                         }
                     }
@@ -144,8 +143,9 @@ void evaluate(string currWord, string randomWord, Letter wordGrid[][4], int row,
                         found = true;
                     }
 
-                    if(!found){
+                    if(!found && wordGrid[row][i].getColor() != "GREEN"){
                         wordGrid[row][i].setColor("YELLOW");
+                        yellowLetters.push_back(currWord[i]);
                     }
 
                 }
@@ -173,7 +173,7 @@ int main(){
     int row = 0;    // current row #
     string currWord;    // current word that the user guessed
     Letter wordGrid[7][4];    // 2D array for the 7 by 4 grid
-    string words[150];  // array for possible words to be guessed
+    string words[300];  // array for possible words to be guessed
     ifstream inputFile; // file that wil stream in all the words from a txt
     string line;    // storage variable for each line of the txt file
     string randomWord;  // the correct word the user is trying to find
@@ -187,13 +187,13 @@ int main(){
         return 1;
     }
 
-    for(int i = 0; i < 150; i++){
+    for(int i = 0; i < 300; i++){
         getline(inputFile,line);
         words[i] = line;
     }
 
     srand(time(NULL));
-    int randIndex = rand() % 150;
+    int randIndex = rand() % 300;
     randomWord = toUpper(words[randIndex]);
     //cout << endl << randomWord << endl;  // debugging - shows the random word
 
