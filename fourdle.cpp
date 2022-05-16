@@ -49,7 +49,7 @@ string toUpper(string word){    // converts all the words to uppercase so they c
 
 }
 
-bool isValid(string word){  // checks if the inputted word is a real 4-letter word
+bool isValid(string word, string dict[3130]){  // checks if the inputted word is a real 4-letter word
 
     if(word.length() != 4){
         return false;
@@ -61,7 +61,15 @@ bool isValid(string word){  // checks if the inputted word is a real 4-letter wo
         }
     }
 
-    return true;
+    word = toUpper(word);
+
+    for(int i = 0; i < 3130; i++){
+        if(word == dict[i]){
+            return true;
+        }
+    }
+
+    return false;
 
 }
 
@@ -174,22 +182,31 @@ int main(){
     string currWord;    // current word that the user guessed
     Letter wordGrid[7][4];    // 2D array for the 7 by 4 grid
     string words[300];  // array for possible words to be guessed
-    ifstream inputFile; // file that wil stream in all the words from a txt
+    string dictionary[3130];    // array for all the 4 letter words in the dictionary
+    ifstream randomFile; // file that wil stream in all the random words to guess from a txt
+    ifstream dictionaryFile;    // file that will stream in all the 4 letter words in the dictionary
     string line;    // storage variable for each line of the txt file
     string randomWord;  // the correct word the user is trying to find
 
 
     // Setting up the game
 
-    inputFile.open("words.txt");    // opens the txt file 
-    if(!inputFile.is_open()){
+    randomFile.open("words.txt");    // opens the random file 
+    dictionaryFile.open("dictionary.txt");  // opens the dictionary file
+
+    if(!randomFile.is_open() || !dictionaryFile.is_open()){ // error check
         cout << "File error accessing words. Please try again.";
         return 1;
     }
 
-    for(int i = 0; i < 300; i++){
-        getline(inputFile,line);
+    for(int i = 0; i < 300; i++){   // random file loop - stored in array
+        getline(randomFile,line);
         words[i] = line;
+    }
+
+    for(int i = 0; i < 3130; i++){  // dictionary file loop - stored in array
+        getline(dictionaryFile,line);
+        dictionary[i] = toUpper(line);
     }
 
     srand(time(NULL));
@@ -208,10 +225,10 @@ int main(){
 
         do{
             cin >> currWord;
-            if(cin.fail() || isValid(currWord) == false){
+            if(cin.fail() || isValid(currWord,dictionary) == false){
                 cout << "Invalid word. Try again." << endl;
             }
-        }while(cin.fail() || isValid(currWord) == false);
+        }while(cin.fail() || isValid(currWord,dictionary) == false);
 
         currWord = toUpper(currWord);
 
