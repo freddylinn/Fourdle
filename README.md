@@ -9,6 +9,10 @@
 1. Open a terminal
 2. Navigate to the directory that the Fourdle folder is in using the `cd` command
 3. Enter `./playFourdle` into the terminal
+    - **WARNING**:  The executable was compiled on a silicon Mac which seems to cause issues with other terminals. Because of this, players may need to compile the program on their own machine.
+        - To compile, enter the following command in Fourdle's directory: `g++ fourdle.cpp Letter.cpp`
+            - If g++ is not installed, enter `g++` into the terminal first
+        - After compiling, enter the command `./a.out`
 
 ## Game Rules
 
@@ -28,3 +32,4 @@
     - The list is 300 words long
 
 - The list of possible words to try as guesses includes all of the four-letter words in the dictionary
+
